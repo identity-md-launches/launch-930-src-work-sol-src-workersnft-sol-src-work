@@ -1,0 +1,33 @@
+{
+  "kind": "univ4_hook",
+  "hook": {
+    "contract": "WorkHook",
+    "constructorArgs": [
+      "$poolManager",
+      "$token",
+      "0xc9eafe33a510a3a3d95a94c4f85adaf6a3ea12a0",
+      "60"
+    ],
+    "permissions": [
+      "beforeInitialize",
+      "afterInitialize",
+      "beforeSwap",
+      "afterSwap",
+      "beforeSwapReturnDelta",
+      "afterSwapReturnDelta"
+    ]
+  },
+  "token": {
+    "contract": "Work",
+    "name": "Work",
+    "symbol": "WORK",
+    "decimals": 18
+  },
+  "pool": {
+    "pairedCurrency": "0x5f7bb59365ce557c26dbcaa4ee9d39a4b95b7127",
+    "fee": 12500,
+    "tickSpacing": 60,
+    "initialPrice": "79228162514264337593543950336"
+  },
+  "notes": "Build configuration gap: this checkout contains no foundry.toml. Verification must supply Solidity 0.8.26, optimizer enabled with 200 runs, via IR, bytecode_hash none and Cancun explicitly; this manifest does not configure the compiler. Intended for Robinhood Chain 4663. Initial sqrtPriceX96 is 2^96, choosing tick zero and a 1:1 raw-unit WORK/IMD ratio, consistent with the test fixture; the brief specifies no other starting price. Work (src/Work.sol) is a non-upgradeable, no-argument ERC-20 minting 1,000,000,000 WORK to its deployer. WorkHook (src/WorkHook.sol) takes manager, token, owner and tickSpacing in that order and creates WorkersNFT (src/WorkersNFT.sol) with token, owner and itself; workers() exposes that instance. Only Work and WorkHook are direct launch deployments. Hook address low 14 bits must equal 0x30cc. The six declared callbacks/return-delta flags exactly match getHookPermissions. Both initialization callbacks require the PoolManager and validate the sorted WORK/IMD currencies, this hook, fee 12500 and configured spacing; initialization is single-use. The 1.25% LP fee is separate from the hook's 0.75% IMD fee on buys and sells, owner-bounded to 0-8.75%. During minting hook fees go to B; afterward the staker share defaults to 100% and is bounded to 90-100%, with the remainder or all fees when nothing is staked going to B. WorkersNFT is the non-upgradeable Workers ERC-721, capped at 3,333, with only paid PoW minting, ArbSys anchors at most 250 blocks old, one mint per L2 block, eight-mint retargeting toward ten seconds, idle easing, epoch difficulty floors and swap-and-pop ID selection. Nine IMD price epochs run from 0.25 to 5, with owner scaling limited to 0.5-1x. Overclocked metadata uses oc/; the initial base URI is ipfs://bafybeibmkvtnptsqztdvsm5sh3avormdnfyarbxpgdlcj6bmg37qchhqve/. Metadata supports ERC-4906; ERC-2981 royalties default to 5% for B, capped at 10%. Mint receipts split 65% to stakers, 25% to buybacks and 10% to B; absent stakers their share joins buybacks. Escrow locks last 7/14/30 days with weights 1/2/4; IMD claims are reserve-capped and unlocked NFTs return by plain transfer. Anyone may buy back at most 100 IMD from the buyback reserve once per 60 seconds; the hook enforces a warmed 30-minute TWAP minimum, accounts for fees and allows 1% slippage, sending WORK to 0x000000000000000000000000000000000000dEaD. B funds 100M WORK mining and 50M WORK burn reserves via fundPools(). After permanent mint end, one-time activation costs 0.15 IMD to B, adjustable within 0-0.5. Eight eras each emit 12.5M WORK over 7*2^k days to activated unburned workers. Unclaimed WORK follows the NFT and is claimable by its holder or staker; paused or inactive-period emissions carry forward. Burns require an unstaked NFT and pay the fixed 50M WORK allocation divided by mint-end supply. Pauses last at most 24 hours with 24 hours unpaused between pauses; claims, activation, unlocked exits, transfers and burns remain callable. Cap reductions, permanent mint closure and bounded parameter changes emit events; parameters have getters. After all eras the owner may release only unassigned mining funds while unpaused. Sweeps send strays to B while preserving NFT contract reserves. Supply distribution and deployment authorization remain governed by the separately versioned launch policy."
+}
